@@ -31,6 +31,7 @@ spec:
       containers:
         - name: {{ .Chart.Name }}
           env:
+          {{- if .Values.dbConfig }}
             {{- if or (.Values.dbConfig.useExistingSecret.name) (.Values.postgresql.enabled) }}
             - name: POSTGRESQL_PASSWORD
               valueFrom:
@@ -62,12 +63,13 @@ spec:
             - name: DATABASE_SSL
               value: "{{ .Values.dbConfig.ssl | default "false" }}"
             {{- end }}
-            - name: DATABASE_URL
-              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
             {{- if .Values.dbConfig.schema }}
             - name: DATABASE_SCHEMA
               value: "{{ .Values.dbConfig.schema }}"
             {{- end }}
+          {{- end }}
+            - name: DATABASE_URL
+              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
             {{- if .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
             {{- end }}
