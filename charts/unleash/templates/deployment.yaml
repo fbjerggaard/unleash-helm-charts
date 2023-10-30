@@ -68,8 +68,6 @@ spec:
               value: "{{ .Values.dbConfig.schema }}"
             {{- end }}
           {{- end }}
-            - name: DATABASE_URL
-              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
             {{- if .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
             {{- end }}
@@ -85,6 +83,8 @@ spec:
             {{- with .Values.existingSecrets }}
               {{- tpl . $ | nindent 12 }}
             {{- end }}
+            - name: DATABASE_URL
+              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
