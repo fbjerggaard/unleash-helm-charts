@@ -59,14 +59,17 @@ spec:
             - name: DATABASE_USER
               value: "{{ .Values.dbConfig.user }}"
             {{- end }}
-            {{- if .Values.dbConfig.ssl }}
             - name: DATABASE_SSL
               value: "{{ .Values.dbConfig.ssl | default "false" }}"
-            {{- end }}
             {{- if .Values.dbConfig.schema }}
             - name: DATABASE_SCHEMA
               value: "{{ .Values.dbConfig.schema }}"
             {{- end }}
+            {{- if .Values.dbConfig.url }}
+            - name: DATABASE_URL
+              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
+            {{- end }}
+          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           {{- end }}
             {{- if .Values.env }}
             {{- toYaml .Values.env | nindent 12 }}
@@ -83,9 +86,6 @@ spec:
             {{- with .Values.existingSecrets }}
               {{- tpl . $ | nindent 12 }}
             {{- end }}
-            - name: DATABASE_URL
-              value: "postgres://$(DATABASE_USER):$(DATABASE_PASS)@$(DATABASE_HOST):$(DATABASE_PORT)/$(DATABASE)"
-          image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http
